@@ -15,11 +15,48 @@ on:
 
 jobs:
   build-and-push-image:
-    uses: ./.github/workflows/build-and-push.yml
-    secrets:
-      REPO_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GITHUB_REGISTRY: ghcr.io
-      GITHUB_ACTOR: ${{ github.actor }}
-    with:
-      environment: release
-      image_name: ${{ github.repository }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.17.1
+      - name: Config name
+        run: |
+          git config --global user.name "joao"
+      - name: Config email
+        run: |
+          git config --global user.email "joao.mendes@marvelous.digital"
+      - name: Checkout
+        run: |
+          git checkout -b deploy-prod
+      - name: Install
+        run: |
+          yarn install
+      - name: Install CLI
+        uses: dopplerhq/cli-action@v3
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: 'ghcr.io'
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ secrets.GITHUB_REGISTRY }}/${{ inputs.image_name }}
+      - name: Build and push Docker image to repo
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./docker/Dockerfile.prod
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
