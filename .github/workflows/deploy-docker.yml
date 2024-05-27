@@ -1,0 +1,30 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# GitHub recommends pinning actions to a commit SHA.
+# To get a newer version, you will need to update the SHA.
+# You can also reference a tag or branch, but the action may change without warning.
+
+name: Create and publish a Docker image
+
+on:
+  push:
+    branches: ['release']
+
+jobs:
+  build-and-push-image:
+    uses: ./.github/workflows/build-and-push.yml
+    secrets:
+      REPO_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_REGISTRY: ghcr.io
+      GITHUB_ACTOR: ${{ github.actor }}
+    with:
+      environment: release
+      image_name: ${{ github.repository }}
+  # redeploy-and-notify:
+  #   needs: build-and-push-image
+  #   uses: ./.github/workflows/redeploy-and-notify.yml
+  #   with:
+  #     environment: docker_staging
