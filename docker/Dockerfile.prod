@@ -17,4 +17,4 @@ COPY . ./socket-server
 
 
 EXPOSE 3000
-CMD [ "node", "./socket-server/server.ts" ]
+CMD [ "node", "./socket-server/dist/server.js" ]

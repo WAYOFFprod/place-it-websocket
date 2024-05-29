@@ -1,6 +1,6 @@
 ## Run locally 
 ```bash
-node server.ts
+npm run dev
 ```
 
 
