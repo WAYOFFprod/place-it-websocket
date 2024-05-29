@@ -15,4 +15,6 @@ COPY . ./socket-server
 # Optional, only needed if you rely on unbundled dependencies
 # COPY --from=build /src/node_modules /src/node_modules
 
+
+EXPOSE 3000
 CMD [ "node", "./socket-server/server.ts" ]
