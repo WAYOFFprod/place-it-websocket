@@ -10,4 +10,4 @@ DS_
 .cache/
 
 .DS_Store
-./dist
+dist/*

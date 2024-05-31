@@ -3,21 +3,24 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
-// import axios, { AxiosResponse } from "axios";
+import ServerRequests from "./helpers/serverRequest";
+import { disconnect } from "node:process";
 
 dotenv.config();
 
 const port = process.env.PORT || 3000;
+const serverUrl = process.env.SERVER_URL || "http://localhost";
 
 const app = express();
-// app.use(cors())
+
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:5173',
   }
 });
-// console.log(io);
+
+const serverRequest = new ServerRequests(serverUrl+"/api")
 
 let payload = {
   "id": 1,
@@ -44,10 +47,6 @@ let payload = {
   // }
 }
 
-// const client = axios.create({
-//   baseURL: process.env.SERVER_URL+'/api',
-// });
-
 
 
 server.listen(port, () => {
@@ -61,18 +60,24 @@ app.get("/", (req: Request, res: Response) => {
 
 
 io.on('connection', (socket) => {
-  console.log("user connected");
-  socket.on('new-pixel', (position: any, color: any) => {
-    console.log('color:', color);
-    socket.broadcast.emit('new-pixel-from-others',position, color);
-    const k = position.x + (position.y * position.x);
+  console.log("user connected", socket.id);
+  socket.on('new-pixel', (index: number, position: Coord, color: string) => {
+    console.log(position, color);
+    socket.broadcast.emit('new-pixel-from-others', position, color);
+
     const pixels: any = {};
-    pixels[k] = 1;
-    payload.pixels = pixels ;
-    console.log(payload);
-    // axios.post("/place-pixel", payload)
-    //   .then((response: AxiosResponse) => {
-    //     console.log(response);
-    //   })
+    pixels[index] = color;
+    payload.pixels = pixels;
+
+    serverRequest.post("/place-pixel", payload)
+    
+  })
+
+  socket.on("disconnect", (reason) => {
+    console.log("disconnected:", reason)
+  });
+
+  socket.on('reset', () => {
+    socket.broadcast.emit('reset-others');
   })
 });
