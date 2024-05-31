@@ -16,9 +16,12 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
   }
 });
+
+console.log(process.env.CLIENT_URL)
+console.log(process.env.SERVER_URL)
 
 const serverRequest = new ServerRequests(serverUrl+"/api")
 
@@ -61,6 +64,7 @@ app.get("/", (req: Request, res: Response) => {
 
 io.on('connection', (socket) => {
   console.log("user connected", socket.id);
+  console.log()
   socket.on('new-pixel', (index: number, position: Coord, color: string) => {
     console.log(position, color);
     socket.broadcast.emit('new-pixel-from-others', position, color);
