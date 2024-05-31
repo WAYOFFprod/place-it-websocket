@@ -37,7 +37,9 @@ jobs:
       - name: Build
         run: npm run build
       - name: cleanup
-        run: ls
+        run: rm -r README.md docker node_modules nodemon.json package-lock.json package.json src tsconfig.json
+      - name: move files to root
+        run: mv -r dist/ ./
       - name: copy file via ssh
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -45,5 +47,5 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
-          source: 'dist/*'
+          source: '*'
           target: 'place-it.wayoff.tv'
