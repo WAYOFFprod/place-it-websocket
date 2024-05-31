@@ -11,7 +11,7 @@ name: Create and publish a Docker image
 
 on:
   push:
-    branches: ['release']
+    branches: ['none']
 
 env:
   REGISTRY: ghcr.io
@@ -20,7 +20,7 @@ env:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}cat 
     permissions:
       contents: read
       packages: write
