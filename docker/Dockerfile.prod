@@ -1,4 +1,4 @@
-ARG NODE_VERSION=16.17.1
+ARG NODE_VERSION=18.19.0
 
 FROM node:${NODE_VERSION}-alpine
 
@@ -11,10 +11,10 @@ ENV NODE_ENV=production
 
 ENV PORT=$PORT
 
-COPY . ./socket-server
+COPY ./ ./
 # Optional, only needed if you rely on unbundled dependencies
 # COPY --from=build /src/node_modules /src/node_modules
 
 
 EXPOSE 3000
-CMD [ "node", "./socket-server/dist/server.js" ]
+CMD [ "node", "dist/index.js" ]
