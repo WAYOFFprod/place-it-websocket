@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import ServerRequests from "./helpers/serverRequest";
-import { disconnect } from "node:process";
 
 dotenv.config();
 
@@ -58,6 +57,8 @@ server.listen(port, () => {
 
 
 app.get("/", (req: Request, res: Response) => {
+  console.log(process.env.CLIENT_URL)
+  console.log(process.env.SERVER_URL)
   res.send("Express + TypeScript Server 2");
 });
 

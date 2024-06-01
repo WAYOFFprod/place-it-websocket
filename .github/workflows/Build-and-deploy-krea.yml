@@ -11,7 +11,7 @@ name: Create and publish to swisscenter
 
 on:
   push:
-    branches: ['release']
+    branches: ['none']
 
 env:
   REGISTRY: ghcr.io
