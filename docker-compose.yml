@@ -1,0 +1,16 @@
+version: "1"
+services:
+  websocket:
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile.dev
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      - PORT=3000
+      - CLIENT_URL=${CLIENT_URL}
+      - SERVER_URL=${SERVER_URL}
+    volumes:
+      - ".:/app/"
+      - "/app/node_modules"
+    command: npm start

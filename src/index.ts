@@ -8,7 +8,7 @@ import ServerRequests from "./helpers/serverRequest";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
-const serverUrl = process.env.SERVER_URL || "http://localhost";
+const serverUrl = "http://"+process.env.SERVER_URL || "http://localhost";
 
 const app = express();
 
@@ -19,8 +19,7 @@ const io = new Server(server, {
   }
 });
 
-console.log(process.env.CLIENT_URL)
-console.log(process.env.SERVER_URL)
+console.log(serverUrl)
 
 const serverRequest = new ServerRequests(serverUrl+"/api")
 
@@ -57,8 +56,6 @@ server.listen(port, () => {
 
 
 app.get("/", (req: Request, res: Response) => {
-  console.log(process.env.CLIENT_URL)
-  console.log(process.env.SERVER_URL)
   res.send("Express + TypeScript Server 2");
 });
 
