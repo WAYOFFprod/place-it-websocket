@@ -13,4 +13,4 @@ services:
     volumes:
       - ".:/app/"
       - "/app/node_modules"
-    command: npm start
+    command: /usr/bin/supervisord -c /app/docker/supervisor.conf
