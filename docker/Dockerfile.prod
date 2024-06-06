@@ -19,4 +19,4 @@ RUN apk --update add redis supervisor
 
 
 EXPOSE 3000
-CMD ["/usr/bin/supervisord", "-c", "/app/docker/supervisord.conf.prod"]
+CMD ["/usr/bin/supervisord", "-c", "/app/docker/supervisor.conf.prod"]
