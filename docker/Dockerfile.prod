@@ -14,10 +14,6 @@ ENV PORT=$PORT
 
 COPY . .
 
-# COPY package*.json .
-RUN npm install
-RUN npm run build
-
 
 RUN apk --update add redis supervisor
 
