@@ -30,24 +30,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.17.1
-      - name: Config name
-        run: |
-          git config --global user.name "joao"
-      - name: Config email
-        run: |
-          git config --global user.email "joao.mendes@marvelous.digital"
-      - name: Checkout
-        run: |
-          git checkout -b deploy-prod
-      - name: Install
-        run: |
-          npm install
-      - name: Build
-        run: |
-          npm run build
-      - name: Install CLI
-        uses: dopplerhq/cli-action@v3
+          node-version: 20
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
