@@ -1,0 +1,25 @@
+[supervisord]
+nodaemon=true
+loglevel = info
+logfile=/var/log/supervisord.log
+pidfile=/var/run/supervisord.pid
+
+[program:redis]
+directory=/
+command=redis-server /app/docker/redis.conf
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+autostart=true
+autorestart=true
+user=root
+
+[program:websocket]
+directory=/app/
+command=npm run start
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+autorestart=true

@@ -15,12 +15,12 @@ ENV PORT=$PORT
 COPY . .
 
 # COPY package*.json .
-
 RUN npm install
+RUN npm run build
 
 
 RUN apk --update add redis supervisor
 
 
 EXPOSE 3000
-CMD ["/usr/bin/supervisord", "-c", "/app/docker/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-c", "/app/docker/supervisord.conf.prod"]
