@@ -39,7 +39,6 @@ const savePixels = async (payload: PixelsPayload) => {
 }
 
 function doSomething() {
-    console.log('-------');
     redis.saveEntries(1, savePixels);
 }
 

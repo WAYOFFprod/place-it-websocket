@@ -29,7 +29,6 @@ export default class redisApp{
 
     await this.redisClient.set('key', 'test');
     const value = await this.redisClient.get('key');
-    console.log("VAL", value);
 
 
     // this.redisClient = await getCache()
@@ -37,14 +36,12 @@ export default class redisApp{
 
   saveEntry(data: PixelsPayload) {
     for (const [id, color] of Object.entries(data.pixels)) {
-      console.log(`${color}: ${id}`);
         if(this.redisClient != undefined) {
           const pixel = JSON.stringify({
             "id": id.toString(),
             "color": color
           });
           const key = this.STREAMS_KEY+data.id;
-          console.log("PIXEL:",pixel)
           this.redisClient.xAdd(key, "*", JSON.parse(pixel));
         };
       };
@@ -55,8 +52,6 @@ export default class redisApp{
     if(this.redisClient == undefined) return;
     let response = await this.redisClient.xRange(key, "-", "+")
     if(response && response.length > 0) {
-      // this.currentId = response[0].messages[0].id;
-      // console.log(this.currentId);
       const firstId = response[0].id;
       const lastId = response[response.length-1].id;
       const data = response.map((message) => {
