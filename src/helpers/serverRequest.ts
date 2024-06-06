@@ -1,8 +1,11 @@
+
 export default class ServerRequests {
   host: string
 
-  constructor(host: string) {
-    this.host = host;
+  constructor() {
+    const protocole = process.env.NODE_ENV == 'production' ? 'https://' : 'http://'
+    const serverUrl = protocole + process.env.SERVER_URL || "http://localhost";
+    this.host = serverUrl;
   }
 
   post = async (path: string, payload: Object) => {
