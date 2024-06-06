@@ -10,7 +10,7 @@ import ServerRequests from "./helpers/serverRequest";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
-const serverUrl = "http://"+process.env.SERVER_URL || "http://localhost";
+const serverUrl = process.env.SERVER_URL || "http://localhost";
 
 const app = express();
 
