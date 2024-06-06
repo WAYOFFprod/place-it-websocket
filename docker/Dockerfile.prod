@@ -2,7 +2,7 @@ ARG NODE_VERSION=18.19.0
 
 FROM node:${NODE_VERSION}-alpine
 
-WORKDIR /
+WORKDIR /app/
 
 ARG PORT=3000
 
@@ -12,10 +12,12 @@ ENV REDIS_BASE /opt/redis
 
 ENV PORT=$PORT
 
-COPY package*.json .
+COPY . .
+
+# COPY package*.json .
+
 RUN npm install
 
-COPY . .
 
 RUN apk --update add redis supervisor
 
