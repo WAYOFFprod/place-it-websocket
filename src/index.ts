@@ -10,7 +10,6 @@ import ServerRequests from "./helpers/serverRequest";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
-const serverUrl = process.env.SERVER_URL || "http://localhost";
 
 const app = express();
 
@@ -21,9 +20,7 @@ const io = new Server(server, {
   }
 });
 
-console.log(serverUrl)
-
-const serverRequest = new ServerRequests(serverUrl+"/api")
+const serverRequest = new ServerRequests()
 
 const redis = new redisApp();
 

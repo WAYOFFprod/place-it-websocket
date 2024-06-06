@@ -4,7 +4,7 @@ export default class ServerRequests {
 
   constructor() {
     const protocole = process.env.NODE_ENV == 'production' ? 'https://' : 'http://'
-    const serverUrl = protocole + process.env.SERVER_URL || "http://localhost";
+    const serverUrl = protocole + process.env.SERVER_URL+ "/api" || "http://localhost/api";
     this.host = serverUrl;
   }
 
