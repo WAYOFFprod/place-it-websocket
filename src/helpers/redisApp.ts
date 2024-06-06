@@ -16,7 +16,7 @@ export default class redisApp{
     console.log("testCalled")
     this.redisClient = await createClient({
       socket:{
-        host: '0.0.0.0',
+        host: process.env.REDIS_HOST,
         port: 6379,
       }
     })

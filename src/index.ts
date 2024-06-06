@@ -25,52 +25,6 @@ console.log(serverUrl)
 
 const serverRequest = new ServerRequests(serverUrl+"/api")
 
-// let payload = {
-//   "id": 1,
-//   "pixels": {}
-//   // "pixels": {
-//   //     "0": 16,
-//   //     "1": 2,
-//   //     "2": 3,
-//   //     "3": 4,
-//   //     "4": 5,
-//   //     "5": 6,
-//   //     "6": 7,
-//   //     "7": 8,
-//   //     "8": 9,
-//   //     "9": 10,
-//   //     "10": 11,
-//   //     "11": 12,
-//   //     "12": 13,
-//   //     "13": 14,
-//   //     "14": 15,
-//   //     "15": 16,
-//   //     "20": 1,
-//   //     "21": 1
-//   // }
-// }
-
-
-// const testRedis = async () => {
-//   console.log("-------|||||--------")
-//   console.log("testCalled")
-//   const redisClient = await createClient({
-//     socket:{
-//       host: '0.0.0.0',
-//       port: 6379,
-//     }
-//   })
-//   .on('error', err => console.log('Redis Client Error', err))
-//   .connect();
-
-//   await redisClient.set('key', 'test');
-//   const value = await redisClient.get('key');
-//   console.log("VAL", value);
-//   await redisClient.disconnect();
-// }
-
-// testRedis();
-
 const redis = new redisApp();
 
 server.listen(port, () => {

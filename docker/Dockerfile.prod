@@ -8,13 +8,17 @@ ARG PORT=3000
 
 ENV NPM_CONFIG_LOGLEVEL info
 ENV NODE_ENV=production
+ENV REDIS_BASE /opt/redis
 
 ENV PORT=$PORT
 
-COPY ./ ./
-# Optional, only needed if you rely on unbundled dependencies
-# COPY --from=build /src/node_modules /src/node_modules
+COPY package*.json .
+RUN npm install
+
+COPY . .
+
+RUN apk --update add redis supervisor
 
 
 EXPOSE 3000
-CMD [ "node", "dist/index.js" ]
+CMD ["/usr/bin/supervisord", "-c", "/app/docker/supervisord.conf"]
