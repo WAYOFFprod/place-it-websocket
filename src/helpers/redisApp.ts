@@ -13,7 +13,6 @@ export default class redisApp{
 
   testRedis = async () => {
     console.log("-------|||||--------")
-    console.log("testCalled")
     this.redisClient = await createClient({
       socket:{
         host: process.env.REDIS_HOST,
@@ -65,6 +64,8 @@ export default class redisApp{
 
       data.forEach(pixel => {
         const p = pixel.id.toString()
+        const id = parseInt(pixel.id);
+        if(isNaN(id)) return;
         payload.pixels[parseInt(pixel.id)] = pixel.color;
       })
       console.log("response", payload, firstId, lastId)
