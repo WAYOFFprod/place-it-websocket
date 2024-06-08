@@ -62,14 +62,17 @@ export default class redisApp{
         pixels: {}
       };
 
+      let count = 0
       data.forEach(pixel => {
         const p = pixel.id.toString()
         const id = parseInt(pixel.id);
         if(isNaN(id)) return;
         payload.pixels[parseInt(pixel.id)] = pixel.color;
+        count++;
       })
+      if(count == 0) return
+      
       console.log("response", payload, firstId, lastId)
-
       const isSaved = await savePixelToDb(payload) 
 
       if(isSaved) {
