@@ -164,9 +164,7 @@ export default class redisApp {
     const key = this.CHAT_KEY+canvaId;
     const now = new Date();
     const date = now.getTime() - 1000 * 60;
-    console.log("CLEAN UP", now.getTime(),date)
     const res = await this.redisClient?.zRemRangeByScore(key, -1, date)
-    console.log("res", res);
   }
 
 }
