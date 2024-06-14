@@ -1,5 +1,5 @@
 import { createClient, commandOptions } from 'redis';
-import {PixelsPayload} from '../@types/types'
+import {PixelsPayload, MessagePayload, UserData} from '../@types/types'
 
 export type RedisClientType = ReturnType<typeof createClient>
 
@@ -7,6 +7,7 @@ export default class redisApp {
   static #instance: redisApp
   redisClient: RedisClientType | undefined
   STREAMS_KEY = "canvas:";
+  CHAT_KEY = "chat:"
   currentId = '0-0';
 
   static getInstance() {
@@ -39,7 +40,7 @@ export default class redisApp {
     const value = await this.redisClient.get('key');
 
 
-    // this.redisClient = await getCache()
+    this.createChatRoom(0)
   }
 
   saveEntry(data: PixelsPayload) {
@@ -120,4 +121,52 @@ export default class redisApp {
       return payload
     }
   }
+
+  createChatRoom(canvasId: number) {
+    const totalUserExists = this.redisClient?.exists("total_users")
+    if(!totalUserExists) {
+      this.redisClient?.set("total_user", 0);
+      this.redisClient?.set("canva:"+canvasId+":name", "canva 1");
+    }
+  }
+
+  async createChatUser(name: string, canvasId: number) {
+    const nextId = await this.redisClient?.incr("total_users")
+    const userKey = "user:"+nextId
+    this.redisClient?.set(name, userKey)
+    this.redisClient?.sAdd("user:"+nextId+"canvas", canvasId.toString())
+
+    return {
+      id: nextId,
+      username: name
+    } as UserData
+  }
+
+  async getLatestMessages(canvaId: number) {
+    const key = this.CHAT_KEY+canvaId;
+    const messages = await this.redisClient?.zRange(key, 0, -1);
+    return messages;
+  }
+
+  async saveMessage(data: MessagePayload) {
+    if(this.redisClient != undefined) {
+      const message = JSON.stringify(data.message);
+      const key = this.CHAT_KEY+data.id;
+      const zmember = {
+        value: message,
+        score: parseFloat(data.message?.time)
+      }
+      const val = await this.redisClient.zAdd(key, zmember);
+    };
+  }
+
+  async cleanUp(canvaId: number) {
+    const key = this.CHAT_KEY+canvaId;
+    const now = new Date();
+    const date = now.getTime() - 1000 * 60;
+    console.log("CLEAN UP", now.getTime(),date)
+    const res = await this.redisClient?.zRemRangeByScore(key, -1, date)
+    console.log("res", res);
+  }
+
 }

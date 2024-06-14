@@ -9,4 +9,21 @@ interface PixelsPayload {
   pixels: {[key: string]: string}
 }
 
-export {PixelsPayload, Coord}
+interface UserData {
+  id: number
+  username: string
+}
+
+interface MessagePayload {
+  id: number,
+  message: Message
+}
+
+interface Message {
+  time: string
+  user: string
+  respondTo?: string
+  message: string
+}
+
+export {PixelsPayload, Coord, MessagePayload, UserData}

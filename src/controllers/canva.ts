@@ -24,7 +24,7 @@ export default class CanvaController {
       return payload
     })
 
-    socket.on(this.scope+'get-pixels', async () => {
+    socket.on('init', async () => {
       const payload = await this.redis.getEntries(1);
       socket.emit(this.scope+"init-pixels", payload)
     })
@@ -34,8 +34,5 @@ export default class CanvaController {
       socket.broadcast.emit(this.scope+'reset-others');
     })
   }
-
- 
-
 
 }

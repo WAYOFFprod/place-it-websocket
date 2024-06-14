@@ -66,6 +66,7 @@ const savePixels = async (payload: PixelsPayload) => {
 
 const save = () => {
   redis.saveEntries(1, savePixels);
+  redis.cleanUp(0);
 }
 
 setInterval(save, 5000);
