@@ -12,7 +12,6 @@ export default class CanvaController {
     this.redis = redisApp.getInstance();
     this.serverRequest = ServerRequests.getInstance();
     socket.on(this.scope+'new-pixel', (index: number, position: Coord, color: string) => {
-      console.log("NREWWEWEWEWEW")
       socket.broadcast.emit(this.scope+'new-pixel-from-others', position, color);
       
       let payload: PixelsPayload = {

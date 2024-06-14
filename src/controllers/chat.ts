@@ -8,8 +8,8 @@ export default class ChatController {
   constructor(socket: Socket) {
     this.redis = redisApp.getInstance();
 
-    // socket.on(this.scope+'get-message', async () => {
-
-    // }
+    socket.on(this.scope+'new-message', async (message) => {
+      socket.broadcast.emit(this.scope+'get-message', message);
+    })
   }
 }
