@@ -1,6 +1,15 @@
 
 export default class ServerRequests {
+  static #instance: ServerRequests
   host: string
+
+
+  static getInstance() {
+    if (!this.#instance) {
+      this.#instance = new ServerRequests();
+    }
+    return this.#instance;
+  }
 
   constructor() {
     const protocole = process.env.NODE_ENV == 'production' ? 'https://' : 'http://'

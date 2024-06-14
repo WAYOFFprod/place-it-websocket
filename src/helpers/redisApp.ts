@@ -1,12 +1,21 @@
 import { createClient, commandOptions } from 'redis';
-import { getCache } from "./cache";
+import {PixelsPayload} from '../@types/types'
 
 export type RedisClientType = ReturnType<typeof createClient>
 
-export default class redisApp{
+export default class redisApp {
+  static #instance: redisApp
   redisClient: RedisClientType | undefined
   STREAMS_KEY = "canvas:";
   currentId = '0-0';
+
+  static getInstance() {
+    if (!this.#instance) {
+      this.#instance = new redisApp();
+    }
+    return this.#instance;
+  }
+
   constructor() {
     this.testRedis();
   }
@@ -72,7 +81,6 @@ export default class redisApp{
       })
       if(count == 0) return
       
-      console.log("response", payload, firstId, lastId)
       const isSaved = await savePixelToDb(payload) 
 
       if(isSaved) {
@@ -80,7 +88,7 @@ export default class redisApp{
         let minId = parseInt(minIdSplit[0]);
         let trimResponse = await this.redisClient.xTrim(key, "MINID", minId + 1)
         if(trimResponse > 0) {
-          console.log("trimmed entries:", trimResponse);
+          console.info("trimmed entries:", trimResponse);
         }
       }
 
