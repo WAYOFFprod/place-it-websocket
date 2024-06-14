@@ -24,7 +24,6 @@ export default class ServerRequests {
         body: JSON.stringify(payload), // body data type must match "Content-Type" header
       });
       const res = await response.json();
-      console.log(res);
       return res;
     } catch(error) {
       console.error("Error:", error);

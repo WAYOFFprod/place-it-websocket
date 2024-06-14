@@ -53,14 +53,12 @@ io.on('connection', (socket) => {
   console.log("user connected", socket.id);
 
   socket.on('new-pixel', (index: number, position: Coord, color: string) => {
-    console.log(position, color);
     socket.broadcast.emit('new-pixel-from-others', position, color);
     
     let payload: PixelsPayload = {
       id: 1,
       pixels: {}
     };
-    console.log(index, color)
     payload.pixels[index] = color;
 
     redis.saveEntry(payload)
