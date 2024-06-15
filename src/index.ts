@@ -54,6 +54,7 @@ io.on('connection', (socket) => {
   
 
   socket.on("disconnect", (reason) => {
+    socket.leave("canva-"+canvaId)
     console.log("disconnected:", reason)
   });
 

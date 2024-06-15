@@ -9,7 +9,6 @@ export default class CanvaController {
   scope = "canva:"
   roomId: string | undefined
   constructor(socket: Socket) {
-    console.log("created");
     this.redis = redisApp.getInstance();
     this.serverRequest = ServerRequests.getInstance();
     socket.on(this.scope+'new-pixel', (index: number, position: Coord, color: string) => {
@@ -40,6 +39,5 @@ export default class CanvaController {
 
   switchRoom(roomId: string) {
     this.roomId = roomId
-    console.log("switch Canva", roomId);
   }
 }

@@ -37,7 +37,6 @@ export default class ChatController {
 
   switchRoom(roomId: string) {
     this.roomId = roomId
-    console.log("switch Canva", roomId);
   }
 
 }
