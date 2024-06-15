@@ -68,9 +68,11 @@ io.on('connection', (socket) => {
     if(canvaId != undefined) {
       socket.leave("canva-"+data.canvaId)
     }
+    console.log("Join room:", data.canvaId);
     socket.join("canva-"+data.canvaId)
     chatController.switchRoom("canva-"+data.canvaId)
     canvaController.switchRoom("canva-"+data.canvaId)
+    console.log("Joined room:", data.canvaId);
   })
 });
 
