@@ -20,7 +20,6 @@ export default class ChatController {
 
     socket.on('init', async () => {
       const latestMessages = await this.redis.getLatestMessages(0)
-      console.log(latestMessages);
       socket.emit(this.scope+'init-messages', latestMessages);
     })
     
