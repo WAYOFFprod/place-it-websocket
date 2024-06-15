@@ -14,13 +14,14 @@ export default class CanvaController {
     socket.on(this.scope+'new-pixel', (index: number, position: Coord, color: string) => {
       if(this.roomId == undefined) return
       socket.to(this.roomId).emit(this.scope+'new-pixel-from-others', position, color);
-      
+
       let payload: PixelsPayload = {
         id: 1,
         pixels: {}
       };
+      
       payload.pixels[index] = color;
-  
+        
       this.redis.saveEntry(payload)
       return payload
     })
@@ -33,6 +34,7 @@ export default class CanvaController {
 
     socket.on(this.scope+'reset', () => {
       if(this.roomId == undefined) return
+      this.redis.clearCanva(1);
       socket.to(this.roomId).emit(this.scope+'reset-others');
     })
   }

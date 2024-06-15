@@ -44,6 +44,7 @@ export default class redisApp {
   }
 
   saveEntry(data: PixelsPayload) {
+    console.log("saveentry", data)
     for (const [id, color] of Object.entries(data.pixels)) {
         if(this.redisClient != undefined) {
           const pixel = JSON.stringify({
@@ -94,6 +95,12 @@ export default class redisApp {
       }
 
     }
+  }
+
+  clearCanva(id: number) {
+    const key = this.STREAMS_KEY+id;
+    if(this.redisClient == undefined) return;
+    this.redisClient.xTrim(key, "MAXLEN", 0)
   }
 
   async getEntries (id: number) {
