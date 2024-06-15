@@ -9,6 +9,8 @@ import ServerRequests from "./helpers/serverRequest";
 import Canva from "./controllers/canva";
 import Chat from "./controllers/chat";
 import { PixelsPayload } from "./@types/types";
+import ChatController from "./controllers/chat";
+import CanvaController from "./controllers/canva";
 
 dotenv.config();
 
@@ -26,8 +28,10 @@ const io = new Server(server, {
 const serverRequest = new ServerRequests()
 
 const redis = new redisApp();
-let canvaController;
-let chatController;
+let canvaController: CanvaController;
+let chatController: ChatController;
+
+let canvaId: number | undefined
 
 
 server.listen(port, () => {
@@ -55,6 +59,17 @@ io.on('connection', (socket) => {
 
   socket.on('error', () => {
     console.log("can send back")
+  })
+
+  socket.on('switch-room', (data) => {
+    console.log("switch-room", data)
+    if(canvaId == data.canvaId) return
+    if(canvaId != undefined) {
+      socket.leave("canva-"+data.canvaId)
+    }
+    socket.join("canva-"+data.canvaId)
+    chatController.switchRoom("canva-"+data.canvaId)
+    canvaController.switchRoom("canva-"+data.canvaId)
   })
 });
 

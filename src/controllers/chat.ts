@@ -6,6 +6,7 @@ export default class ChatController {
   redis
   scope = "chat:"
   username: string | undefined
+  roomId: string | undefined
   constructor(socket: Socket) {
     this.redis = redisApp.getInstance();
 
@@ -25,12 +26,18 @@ export default class ChatController {
     
 
     socket.on(this.scope+'new-message', async (message) => {
-      socket.broadcast.emit(this.scope+'get-message', message);
+      if(this.roomId == undefined) return
+      socket.to(this.roomId).emit(this.scope+'get-message', message);
       await this.redis.saveMessage({
         id: 0,
         message: message
       })
     })
+  }
+
+  switchRoom(roomId: string) {
+    this.roomId = roomId
+    console.log("switch Canva", roomId);
   }
 
 }

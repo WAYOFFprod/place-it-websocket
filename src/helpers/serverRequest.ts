@@ -15,7 +15,6 @@ export default class ServerRequests {
     const protocole = process.env.NODE_ENV == 'production' ? 'https://' : 'http://'
     const serverUrl = protocole + process.env.SERVER_URL+ "/api" || "http://localhost/api";
     this.host = serverUrl;
-    console.log(this.host, protocole)
   }
 
   post = async (path: string, payload: Object) => {

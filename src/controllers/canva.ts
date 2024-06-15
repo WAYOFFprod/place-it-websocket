@@ -7,12 +7,14 @@ export default class CanvaController {
   redis
   serverRequest
   scope = "canva:"
+  roomId: string | undefined
   constructor(socket: Socket) {
     console.log("created");
     this.redis = redisApp.getInstance();
     this.serverRequest = ServerRequests.getInstance();
     socket.on(this.scope+'new-pixel', (index: number, position: Coord, color: string) => {
-      socket.broadcast.emit(this.scope+'new-pixel-from-others', position, color);
+      if(this.roomId == undefined) return
+      socket.to(this.roomId).emit(this.scope+'new-pixel-from-others', position, color);
       
       let payload: PixelsPayload = {
         id: 1,
@@ -31,8 +33,13 @@ export default class CanvaController {
 
 
     socket.on(this.scope+'reset', () => {
-      socket.broadcast.emit(this.scope+'reset-others');
+      if(this.roomId == undefined) return
+      socket.to(this.roomId).emit(this.scope+'reset-others');
     })
   }
 
+  switchRoom(roomId: string) {
+    this.roomId = roomId
+    console.log("switch Canva", roomId);
+  }
 }
