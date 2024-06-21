@@ -27,11 +27,12 @@ export default class ServerRequests {
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
-          "Authorization": 'Bearer: '+ process.env.SERVER_TOKEN,
+          "Authorization": `Bearer ${process.env.SERVER_TOKEN}`,
         },
         referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
         body: JSON.stringify(payload), // body data type must match "Content-Type" header
       });
+      console.log("response from laravel:", response.status);
       const res = await response.json();
       return res;
     } catch(error) {
@@ -50,7 +51,7 @@ export default class ServerRequests {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Authorization": 'Bearer: '+ process.env.SERVER_TOKEN,
+            "Authorization": `Bearer ${process.env.SERVER_TOKEN}`,
           },
           referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
         }
