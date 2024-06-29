@@ -43,8 +43,8 @@ export default class redisApp {
     this.createChatRoom(0)
   }
 
-  saveEntry(data: PixelsPayload) {
-    console.log("saveentry", data)
+  async saveEntry(data: PixelsPayload) {
+    // console.log("saveentry", data)
     for (const [id, color] of Object.entries(data.pixels)) {
         if(this.redisClient != undefined) {
           const pixel = JSON.stringify({
@@ -52,7 +52,8 @@ export default class redisApp {
             "color": color
           });
           const key = this.STREAMS_KEY+data.id;
-          this.redisClient.xAdd(key, "*", JSON.parse(pixel));
+          const added = await this.redisClient.xAdd(key, "*", JSON.parse(pixel));
+          console.log(added);
         };
       };
   }
@@ -69,7 +70,7 @@ export default class redisApp {
       })
       
       let payload: PixelsPayload = {
-        id: 1,
+        id: id,
         pixels: {}
       };
 
@@ -84,7 +85,7 @@ export default class redisApp {
       if(count == 0) return
       
       const isSaved = await savePixelToDb(payload) 
-
+      console.log(isSaved);
       if(isSaved) {
         let minIdSplit = lastId.split('-');
         let minId = parseInt(minIdSplit[0]);

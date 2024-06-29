@@ -8,26 +8,47 @@ export default class CanvaController {
   serverRequest
   scope = "canva:"
   roomId: string | undefined
-  constructor(socket: Socket) {
+  id: number | undefined
+  users: number = 0
+
+  constructor(roomId: number, socket: Socket) {
+    this.id = roomId
+    console.log("created canvasController: ",roomId, this.id);
+    this.roomId = "canva-"+roomId
     this.redis = redisApp.getInstance();
     this.serverRequest = ServerRequests.getInstance();
-    socket.on(this.scope+'new-pixel', (index: number, position: Coord, color: string) => {
-      if(this.roomId == undefined) return
+    this.connect(socket)
+  }
+
+  connect(socket: Socket) {
+    this.initSockets(socket);
+    this.users++;
+  }
+  disconnect() {
+    this.users--
+  }
+
+  initSockets(socket: Socket) {
+    console.log("CANVA: init socket", this.roomId, this.id)
+    socket.on(this.scope+'new-pixel:'+this.id, (index: number, position: Coord, color: string) => {
+      if(this.roomId == undefined || this.id == undefined) return
+      console.log("NEW_PIXEL", index, this.scope+'new-pixel-from-others')
       socket.to(this.roomId).emit(this.scope+'new-pixel-from-others', position, color);
 
       let payload: PixelsPayload = {
-        id: 1,
+        id: this.id,
         pixels: {}
       };
       
       payload.pixels[index] = color;
-        
+      console.log("newPixel", index)
       this.redis.saveEntry(payload)
       return payload
     })
 
     socket.on('init', async () => {
-      const payload = await this.redis.getEntries(1);
+      if(this.id == undefined) return;
+      const payload = await this.redis.getEntries(this.id);
       socket.emit(this.scope+"init-pixels", payload)
     })
 
@@ -39,7 +60,17 @@ export default class CanvaController {
     })
   }
 
-  switchRoom(roomId: string) {
-    this.roomId = roomId
+  savePixelsToDb() {
+    if(this.id == undefined) return;
+    console.log("saving canva:", this.id);
+    this.redis.saveEntries(this.id, this.savePixels);
+    this.redis.cleanUp(this.id);
+  }
+
+  savePixels = async (payload: PixelsPayload) => {
+    console.log("SAVE pixel to db - id:", payload.pixels);
+    const response = await this.serverRequest.post("/place-pixel", payload)
+    console.log(response);
+    return response.status == 'success';
   }
 }
