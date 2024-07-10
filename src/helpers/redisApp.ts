@@ -1,5 +1,5 @@
 import { createClient, commandOptions } from 'redis';
-import {PixelsPayload, MessagePayload, UserData} from '../@types/types'
+import {PixelsPayload, MessagePayload, UserData, ValidationPayload} from '../@types/types'
 
 export type RedisClientType = ReturnType<typeof createClient>
 
@@ -18,10 +18,10 @@ export default class redisApp {
   }
 
   constructor() {
-    this.testRedis();
+    this.initAndTest();
   }
 
-  testRedis = async () => {
+  initAndTest = async () => {
     console.log("-------|||||--------")
     this.redisClient = await createClient({
       socket:{
@@ -43,8 +43,45 @@ export default class redisApp {
     this.createChatRoom(0)
   }
 
+  // Security
+  async serverJoinCanva(data: ValidationPayload) {
+    console.log("serverJoinCanva")
+    let count = 0;
+    while (count <= 20) {
+      if(this.redisClient) {
+        console.log("SAVE KEY", 'canva:'+data.canva_id+':user:'+data.user_id)
+        await this.redisClient.set('canva:'+data.canva_id+':user:'+data.user_id, data.token)
+        // const token = await this.redisClient.get('canva:'+data.canva_id+':user:'+data.user_id);
+        // console.log("token",token)
+        return true
+      } else {
+        console.warn("ERROR: NO REDIS CLIENT !!!", count)
+        await new Promise(r => setTimeout(r, 100));
+        console.log("wait")
+        count++;
+      }
+    }
+    return false
+  }
+  async saveToken() {
+    if(this.redisClient) {
+      
+      return true
+    }
+
+  }
+
+  async isValid(data: ValidationPayload) {
+    // check if that entry exists for the canva and user
+    if(this.redisClient && data.token != undefined) {
+      const token = await this.redisClient.get('canva:'+data.canva_id+':user:'+data.user_id);
+      return token == data.token
+    }
+    return null
+  }
+
+  // Canvas
   async saveEntry(data: PixelsPayload) {
-    // console.log("saveentry", data)
     for (const [id, color] of Object.entries(data.pixels)) {
         if(this.redisClient != undefined) {
           const pixel = JSON.stringify({
@@ -53,7 +90,6 @@ export default class redisApp {
           });
           const key = this.STREAMS_KEY+data.id;
           const added = await this.redisClient.xAdd(key, "*", JSON.parse(pixel));
-          console.log(added);
         };
       };
   }
@@ -85,7 +121,7 @@ export default class redisApp {
       if(count == 0) return
       
       const isSaved = await savePixelToDb(payload) 
-      console.log(isSaved);
+
       if(isSaved) {
         let minIdSplit = lastId.split('-');
         let minId = parseInt(minIdSplit[0]);
@@ -130,6 +166,7 @@ export default class redisApp {
     }
   }
 
+  // Chat
   createChatRoom(canvasId: number) {
     const totalUserExists = this.redisClient?.exists("total_users")
     if(!totalUserExists) {
