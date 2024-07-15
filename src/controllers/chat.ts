@@ -35,6 +35,7 @@ export default class ChatController {
     })
     
 
+    // TODO: Scoping get message to room
     socket.on(this.scope+'new-message', async (message) => {
       const isValid = await this.redis.isValid({
         canva_id: this.id,
@@ -42,6 +43,7 @@ export default class ChatController {
         token: message.token
       })
 
+      // TODO: Scoping get message to room
       if(isValid) {
         socket.to(this.roomId).emit(this.scope+'get-message', message);
         await this.redis.saveMessage({

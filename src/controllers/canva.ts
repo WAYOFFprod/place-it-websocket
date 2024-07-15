@@ -58,6 +58,7 @@ export default class CanvaController {
       // return payload
     })
 
+    // TODO: Scoping get message to room
     socket.on('get-init-state', async () => {
       if(this.id == undefined) return;
       const payload = await this.redis.getEntries(this.id);
