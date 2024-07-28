@@ -31,7 +31,7 @@ export default class ChatController {
 
     socket.on('get-init-state', async () => {
       const latestMessages = await this.redis.getLatestMessages(this.id)
-      socket.to(this.roomId).emit(this.scope+'init-messages', latestMessages);
+      socket.emit(this.scope+'init-messages', latestMessages);
     })
     
 

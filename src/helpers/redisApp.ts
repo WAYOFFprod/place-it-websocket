@@ -81,7 +81,7 @@ export default class redisApp {
   }
 
   // Canvas
-  async saveEntry(data: PixelsPayload) {
+  async cachePixel(data: PixelsPayload) {
     for (const [id, color] of Object.entries(data.pixels)) {
         if(this.redisClient != undefined) {
           const pixel = JSON.stringify({
@@ -94,7 +94,7 @@ export default class redisApp {
       };
   }
 
-  async saveEntries (id: number, savePixelToDb: (pixelsPayload: PixelsPayload) => {}) {
+  async saveCachedPixels (id: number, savePixelToDb: (pixelsPayload: PixelsPayload) => {}) {
     const key = this.STREAMS_KEY+id;
     if(this.redisClient == undefined) return;
     let response = await this.redisClient.xRange(key, "-", "+")
@@ -140,7 +140,7 @@ export default class redisApp {
     this.redisClient.xTrim(key, "MAXLEN", 0)
   }
 
-  async getEntries (id: number) {
+  async getCachedPixels (id: number) {
     const key = this.STREAMS_KEY+id;
     if(this.redisClient == undefined) return;
     let response = await this.redisClient.xRange(key, "-", "+")

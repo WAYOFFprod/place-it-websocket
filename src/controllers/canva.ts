@@ -33,7 +33,6 @@ export default class CanvaController {
       username = socket.id;
     }
 
-    console.log("CANVA: init socket for", this.roomId, username)
     socket.on(this.scope+'new-pixel:'+this.id, async (data: any, index: number, position: Coord, color: string) => {
       const isValid = await this.redis.isValid({
         canva_id: this.id,
@@ -53,7 +52,7 @@ export default class CanvaController {
   
         console.log("newPixel count", index)
   
-        this.redis.saveEntry(payload)
+        this.redis.cachePixel(payload)
       }
       // return payload
     })
@@ -61,7 +60,7 @@ export default class CanvaController {
     // TODO: Scoping get message to room
     socket.on('get-init-state', async () => {
       if(this.id == undefined) return;
-      const payload = await this.redis.getEntries(this.id);
+      const payload = await this.redis.getCachedPixels(this.id);
       socket.emit(this.scope+"init-pixels", payload)
     })
   }
@@ -69,7 +68,7 @@ export default class CanvaController {
   savePixelsToDb() {
     if(this.id == undefined) return;
     console.log("saving canva:", this.id);
-    this.redis.saveEntries(this.id, this.savePixels);
+    this.redis.saveCachedPixels(this.id, this.savePixels);
     this.redis.cleanUp(this.id);
   }
 
