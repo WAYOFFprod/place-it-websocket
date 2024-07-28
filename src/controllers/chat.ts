@@ -5,37 +5,53 @@ import ServerRequests from '../helpers/serverRequest';
 export default class ChatController {
   redis
   scope = "chat:"
-  username: string | undefined
-  roomId: string | undefined
-  constructor(socket: Socket) {
-    this.redis = redisApp.getInstance();
+  roomId: string
+  id: number
 
-    this.connect(socket);
+  constructor(roomId: number, socket: Socket, userId: number, username: string) {
+    this.redis = redisApp.getInstance();
+    this.id = roomId;
+    this.roomId = "canva-"+roomId
+    this.initSockets(socket, userId, username);
   }
 
-  async connect(socket: Socket) {
-    const userData = await this.redis.createChatUser("user", 0)
-    this.username = userData.username
-    console.log("user created on redis:", this.username)
+  connect(socket: Socket, userId: number, username: string) {
+    this.initSockets(socket, userId, username);
+  }
 
-    socket.on('init', async () => {
-      const latestMessages = await this.redis.getLatestMessages(0)
+  disconnect() {
+  }
+
+  async initSockets( socket: Socket, userId: number | null, username: string| null) {
+    if(username == null) {
+      username = socket.id;
+    }
+
+    await this.redis.createChatUser(username, this.id)
+
+    socket.on('get-init-state', async () => {
+      const latestMessages = await this.redis.getLatestMessages(this.id)
       socket.emit(this.scope+'init-messages', latestMessages);
     })
     
 
+    // TODO: Scoping get message to room
     socket.on(this.scope+'new-message', async (message) => {
-      if(this.roomId == undefined) return
-      socket.to(this.roomId).emit(this.scope+'get-message', message);
-      await this.redis.saveMessage({
-        id: 0,
-        message: message
+      const isValid = await this.redis.isValid({
+        canva_id: this.id,
+        user_id: message.id,
+        token: message.token
       })
-    })
-  }
 
-  switchRoom(roomId: string) {
-    this.roomId = roomId
+      // TODO: Scoping get message to room
+      if(isValid) {
+        socket.to(this.roomId).emit(this.scope+'get-message', message);
+        await this.redis.saveMessage({
+          id: this.id,
+          message: message
+        })
+      }
+    })
   }
 
 }
