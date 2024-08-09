@@ -23,9 +23,18 @@ export default class CanvaController {
   connect(socket: Socket, userId: number, username: string) {
     this.initSockets(socket, userId, username);
     this.users++;
+    this.updateServerCount()
   }
   disconnect() {
     this.users--
+    this.updateServerCount()
+  }
+
+  updateServerCount() {
+    this.serverRequest.post('/update-player-count',{
+      'id': this.id,
+      'playerCount': this.users
+    })
   }
 
   initSockets(socket: Socket, userId: number, username: string) {
