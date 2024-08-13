@@ -1,4 +1,3 @@
-/* eslint-disable no-inline-comments */
 import type { RedisClientType } from 'redis'
 import { createClient } from 'redis'
 

@@ -41,6 +41,9 @@ export default class CanvaController {
     if(username == null) {
       username = socket.id;
     }
+    if(userId) {
+      console.warn("No user id")
+    }
 
     socket.on(this.scope+'new-pixel:'+this.id, async (data: any, index: number, position: Coord, color: string) => {
       const isValid = await this.redis.isValid({

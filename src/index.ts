@@ -1,13 +1,11 @@
 // src/index.js
-import express, { NextFunction, Request, Response } from "express";
+import express, { Request, Response } from "express";
 
 import dotenv from "dotenv";
 import redisApp from "./helpers/redisApp";
 import { createServer } from "node:http";
-import { Server, Socket } from "socket.io";
-import ServerRequests from "./helpers/serverRequest";
-import Chat from "./controllers/chat";
-import { PixelsPayload, ValidationPayload } from "./@types/types";
+import { Server } from "socket.io";
+import { ValidationPayload } from "./@types/types";
 import ChatController from "./controllers/chat";
 import CanvaController from "./controllers/canva";
 
@@ -37,14 +35,15 @@ server.listen(port, () => {
 
 
 app.get("/", (req: Request, res: Response) => {
+  if(!req) {
+    console.warn("missing req")
+  }
   res.send("Express + TypeScript Server 2");
 });
 
-app.post("/server/join/", async (req: Request, res: Response, next: NextFunction) => {
+app.post("/server/join/", async (req: Request, res: Response) => {
   console.log("SERVER: new user joining room", req.body)
   // save token to correct room
-  
-
   const validationPayload: ValidationPayload = {
     canva_id: req.body.canva_id,
     user_id: req.body.user_id,

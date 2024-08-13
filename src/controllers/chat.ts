@@ -1,7 +1,5 @@
 import { Socket } from 'socket.io';
-import {PixelsPayload, Coord} from '../@types/types'
 import redisApp from '../helpers/redisApp';
-import ServerRequests from '../helpers/serverRequest';
 export default class ChatController {
   redis
   scope = "chat:"
@@ -25,6 +23,9 @@ export default class ChatController {
   async initSockets( socket: Socket, userId: number | null, username: string| null) {
     if(username == null) {
       username = socket.id;
+    }
+    if(!userId) {
+      console.warn('no userId');
     }
 
     await this.redis.createChatUser(username, this.id)

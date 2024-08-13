@@ -1,4 +1,4 @@
-import { createClient, commandOptions } from 'redis';
+import { createClient } from 'redis';
 import {PixelsPayload, MessagePayload, UserData, ValidationPayload} from '../@types/types'
 
 export type RedisClientType = ReturnType<typeof createClient>
@@ -30,14 +30,14 @@ export default class redisApp {
       }
     })
     .on('error', err => console.log('Redis Client Error', err))
-    .on('connect', err => console.info('Redis connected'))
+    .on('connect', () => console.info('Redis connected'))
     .on('ready', () => {
       console.info('Redis ready!')
     })
     .connect();
 
     await this.redisClient.set('key', 'test');
-    const value = await this.redisClient.get('key');
+    await this.redisClient.get('key');
 
 
     this.createChatRoom(0)
@@ -89,7 +89,7 @@ export default class redisApp {
             "color": color
           });
           const key = this.STREAMS_KEY+data.id;
-          const added = await this.redisClient.xAdd(key, "*", JSON.parse(pixel));
+          await this.redisClient.xAdd(key, "*", JSON.parse(pixel));
         };
       };
   }
@@ -99,7 +99,6 @@ export default class redisApp {
     if(this.redisClient == undefined) return;
     let response = await this.redisClient.xRange(key, "-", "+")
     if(response && response.length > 0) {
-      const firstId = response[0].id;
       const lastId = response[response.length-1].id;
       const data = response.map((message) => {
         return message.message
@@ -112,7 +111,7 @@ export default class redisApp {
 
       let count = 0
       data.forEach(pixel => {
-        const p = pixel.id.toString()
+        // const p = pixel.id.toString()
         const id = parseInt(pixel.id);
         if(isNaN(id)) return;
         payload.pixels[parseInt(pixel.id)] = pixel.color;
@@ -135,7 +134,7 @@ export default class redisApp {
   }
 
   clearCanva(id: number) {
-    const key = this.STREAMS_KEY+id;
+    const key = this.STREAMS_KEY + id;
     if(this.redisClient == undefined) return;
     this.redisClient.xTrim(key, "MAXLEN", 0)
   }
@@ -145,10 +144,6 @@ export default class redisApp {
     if(this.redisClient == undefined) return;
     let response = await this.redisClient.xRange(key, "-", "+")
     if(response && response.length > 0) {
-      // this.currentId = response[0].messages[0].id;
-      // console.log(this.currentId);
-      const firstId = response[0].id;
-      const lastId = response[response.length-1].id;
       const data = response.map((message) => {
         return message.message
       })
@@ -201,7 +196,7 @@ export default class redisApp {
         value: message,
         score: parseFloat(data.message?.time)
       }
-      const val = await this.redisClient.zAdd(key, zmember);
+      await this.redisClient.zAdd(key, zmember);
     };
   }
 
@@ -209,7 +204,7 @@ export default class redisApp {
     const key = this.CHAT_KEY+canvaId;
     const now = new Date();
     const date = now.getTime() - 1000 * 60;
-    const res = await this.redisClient?.zRemRangeByScore(key, -1, date)
+    await this.redisClient?.zRemRangeByScore(key, -1, date)
   }
 
 }
