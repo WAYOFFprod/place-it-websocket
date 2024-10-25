@@ -33,8 +33,12 @@ export default class ServerRequests {
         body: JSON.stringify(payload), // body data type must match "Content-Type" header
       });
       console.log("response from laravel:", response.status);
+
       const res = await response.json();
-      return res;
+      if(response.status == 200) {
+       return res;
+      }
+      return response.status == 201;
     } catch(error) {
       console.error("Error:", error);
     }

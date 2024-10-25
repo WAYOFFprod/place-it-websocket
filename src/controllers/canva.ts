@@ -62,8 +62,6 @@ export default class CanvaController {
         
         payload.pixels[index] = color;
   
-        console.log("newPixel count", index)
-  
         this.redis.cachePixel(payload)
       }
       // return payload
@@ -76,17 +74,15 @@ export default class CanvaController {
         token: data.token
       })
       if(isValid) {
-
+        socket.to(this.roomId).emit(this.scope+'new-pixels-from-others', pixels);
+  
+        let payload: PixelsPayload = {
+          id: this.id,
+          pixels: pixels
+        };
+        
+        this.redis.cachePixel(payload)
       }
-      // TODO: add pixel*s* to client
-      // socket.to(this.roomId).emit(this.scope+'new-pixels-from-others', position, color);
-
-      let payload: PixelsPayload = {
-        id: this.id,
-        pixels: pixels
-      };
-      
-      this.redis.cachePixel(payload)
     })
 
     // TODO: Scoping get message to room
