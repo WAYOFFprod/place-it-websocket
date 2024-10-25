@@ -4,6 +4,10 @@ interface Coord {
   y: number
 }
 
+interface Pixels {
+  [key: string]: string
+}
+
 interface ValidationPayload {
   user_id: number
   canva_id: number
@@ -32,4 +36,4 @@ interface Message {
   message: string
 }
 
-export {PixelsPayload, Coord, MessagePayload, UserData, ValidationPayload}
+export {PixelsPayload, Coord, MessagePayload, UserData, ValidationPayload, Pixels}

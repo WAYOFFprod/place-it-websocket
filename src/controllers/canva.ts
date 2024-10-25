@@ -1,6 +1,6 @@
 
 import { Socket } from 'socket.io';
-import {PixelsPayload, Coord} from '../@types/types'
+import {PixelsPayload, Coord, Pixels} from '../@types/types'
 import redisApp from '../helpers/redisApp';
 import ServerRequests from '../helpers/serverRequest';
 export default class CanvaController {
@@ -13,7 +13,7 @@ export default class CanvaController {
 
   constructor(roomId: number, socket: Socket, userId: number, username: string) {
     this.id = roomId
-    console.log("created canvasController: ",roomId, this.id);
+
     this.roomId = "canva-"+roomId
     this.redis = redisApp.getInstance();
     this.serverRequest = ServerRequests.getInstance();
@@ -67,6 +67,26 @@ export default class CanvaController {
         this.redis.cachePixel(payload)
       }
       // return payload
+    })
+    socket.on(this.scope+'new-pixels:'+this.id, async (data: any, pixels: Pixels) => {
+      console.log("new-pixels", data, pixels)
+      const isValid = await this.redis.isValid({
+        canva_id: this.id,
+        user_id: data.user_id,
+        token: data.token
+      })
+      if(isValid) {
+
+      }
+      // TODO: add pixel*s* to client
+      // socket.to(this.roomId).emit(this.scope+'new-pixels-from-others', position, color);
+
+      let payload: PixelsPayload = {
+        id: this.id,
+        pixels: pixels
+      };
+      
+      this.redis.cachePixel(payload)
     })
 
     // TODO: Scoping get message to room
