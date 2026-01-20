@@ -39,6 +39,9 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.get("/health", (req: Request, res: Response) => {
+  if (!req) {
+    console.warn("missing req");
+  }
   res.send("OK");
 });
 
