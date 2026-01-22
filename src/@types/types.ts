@@ -1,39 +1,45 @@
-
 interface Coord {
-  x: number,
-  y: number
+  x: number;
+  y: number;
 }
 
 interface Pixels {
-  [key: string]: string
+  [key: string]: string;
 }
 
 interface ValidationPayload {
-  user_id: number
-  canva_id: number
-  token: string
+  user_id: number;
+  canva_id: number;
+  token: string;
 }
 
 interface PixelsPayload {
-  id: number
-  pixels: {[key: string]: string}
+  id: number;
+  pixels: { [key: string]: string };
 }
 
 interface UserData {
-  id: number
-  username: string
+  id: number;
+  username: string;
 }
 
 interface MessagePayload {
-  id: number,
-  message: Message
+  id: number;
+  message: Message;
 }
 
 interface Message {
-  time: string
-  user: string
-  respondTo?: string
-  message: string
+  time: string;
+  user: string;
+  respondTo?: string;
+  message: string;
 }
 
-export {PixelsPayload, Coord, MessagePayload, UserData, ValidationPayload, Pixels}
+export {
+  PixelsPayload,
+  Coord,
+  MessagePayload,
+  UserData,
+  ValidationPayload,
+  Pixels,
+};

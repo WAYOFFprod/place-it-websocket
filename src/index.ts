@@ -1,13 +1,13 @@
 // src/index.js
-import express, { Request, Response } from "express";
+import express, { Request, Response } from 'express';
 
-import dotenv from "dotenv";
-import redisApp from "./helpers/redisApp";
-import { createServer } from "node:http";
-import { Server } from "socket.io";
-import { ValidationPayload } from "./@types/types";
-import ChatController from "./controllers/chat";
-import CanvaController from "./controllers/canva";
+import dotenv from 'dotenv';
+import redisApp from './helpers/redisApp';
+import { createServer } from 'node:http';
+import { Server } from 'socket.io';
+import { ValidationPayload } from './@types/types';
+import ChatController from './controllers/chat';
+import CanvaController from './controllers/canva';
 
 dotenv.config();
 
@@ -31,22 +31,22 @@ server.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 
-app.get("/", (req: Request, res: Response) => {
+app.get('/', (req: Request, res: Response) => {
   if (!req) {
-    console.warn("missing req");
+    console.warn('missing req');
   }
-  res.send("Express + TypeScript Server 2");
+  res.send('Express + TypeScript Server 2');
 });
 
-app.get("/health", (req: Request, res: Response) => {
+app.get('/health', (req: Request, res: Response) => {
   if (!req) {
-    console.warn("missing req");
+    console.warn('missing req');
   }
-  res.send("OK");
+  res.send('OK');
 });
 
-app.post("/server/join/", async (req: Request, res: Response) => {
-  console.log("SERVER: new user joining room", req.body);
+app.post('/server/join/', async (req: Request, res: Response) => {
+  console.log('SERVER: new user joining room', req.body);
   // save token to correct room
   const validationPayload: ValidationPayload = {
     canva_id: req.body.canva_id,
@@ -58,30 +58,30 @@ app.post("/server/join/", async (req: Request, res: Response) => {
   res.send(isSaved);
 });
 
-io.on("connect_error", (err) => {
+io.on('connect_error', err => {
   console.log(`connect_error due to ${err.message}`);
 });
 
-io.on("connection", (socket) => {
-  console.log("user connected", socket.id);
+io.on('connection', socket => {
+  console.log('user connected', socket.id);
   let canvaId: number | undefined;
 
-  socket.on("disconnect", (reason) => {
+  socket.on('disconnect', reason => {
     if (!canvaId || !canvaControllers[canvaId]) return;
     canvaControllers[canvaId].disconnect();
     chatControllers[canvaId].disconnect();
-    socket.leave("canva-" + canvaId);
-    console.log("disconnected:", reason);
+    socket.leave('canva-' + canvaId);
+    console.log('disconnected:', reason);
   });
 
-  socket.on("error", () => {
-    console.log("can send back");
+  socket.on('error', () => {
+    console.log('can send back');
   });
 
-  socket.on("join-room", async (data) => {
+  socket.on('join-room', async data => {
     canvaId = data.canvaId;
     // validate token
-    console.log("CLIENT: new user joining room", {
+    console.log('CLIENT: new user joining room', {
       canva_id: data.canvaId,
       user_id: data.userId,
       token: data.token,
@@ -94,30 +94,30 @@ io.on("connection", (socket) => {
     } as ValidationPayload);
 
     if (isValid === false) {
-      socket.emit("error", {
-        source: "live-server",
-        message: "user wont be allowed to place pixels",
+      socket.emit('error', {
+        source: 'live-server',
+        message: 'user wont be allowed to place pixels',
         status: 200,
       });
       return;
     }
     if (isValid === null) {
-      socket.emit("error", {
-        source: "live-server",
-        message: "user must not be authenticated",
+      socket.emit('error', {
+        source: 'live-server',
+        message: 'user must not be authenticated',
         status: 200,
       });
     }
 
-    console.log(data.userId, "joined", data.canvaId);
+    console.log(data.userId, 'joined', data.canvaId);
     if (canvaId != undefined) {
-      socket.leave("canva-" + canvaId);
+      socket.leave('canva-' + canvaId);
     }
 
     const userId = data.userId;
     const username = data.username;
     canvaId = data.canvaId;
-    socket.join("canva-" + canvaId);
+    socket.join('canva-' + canvaId);
 
     if (canvaId != undefined) {
       // if canva exists
@@ -127,24 +127,24 @@ io.on("connection", (socket) => {
           canvaId,
           socket,
           userId,
-          username,
+          username
         );
         canvaControllers[canvaId] = new CanvaController(
           canvaId,
           socket,
           userId,
-          username,
+          username
         );
-        console.log("created room:", canvaId);
+        console.log('created room:', canvaId);
       } else {
         // create controllers
         canvaControllers[canvaId].connect(socket, userId, username);
         chatControllers[canvaId].connect(socket, userId, username);
-        console.log("Joined room:", canvaId);
+        console.log('Joined room:', canvaId);
       }
     }
 
-    socket.emit("live-canva-ready", canvaId);
+    socket.emit('live-canva-ready', canvaId);
   });
 });
 
@@ -160,9 +160,9 @@ const save = () => {
   }
 
   // cleanup canva
-  toDelete.forEach((id) => {
+  toDelete.forEach(id => {
     delete canvaControllers[id];
-    console.log("removed canva controller", id);
+    console.log('removed canva controller', id);
   });
 };
 
