@@ -7,7 +7,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  PORTAINER_WEBHOOK_URL: ${{vars.PORTAINER_WEBHOOK_URL}}
 
 jobs:
   build-and-push-image:
@@ -59,4 +58,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Update Portainer Stack
-        run: curl -X POST ${{ env.PORTAINER_WEBHOOK_URL }}
+        run: curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
