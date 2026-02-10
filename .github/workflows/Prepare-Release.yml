@@ -1,0 +1,90 @@
+# This workflow automates the preparation of release branches in a GitHub repository.
+# It listens for pushes to branches following the pattern 'release/**', extracts the version number,
+# updates package.json, and creates pull requests to both main and develop branches.
+
+name: Prepare Release Branch
+
+on:
+  push:
+    branches:
+      - 'release/**' # Trigger on release/1.0.0, release/v2.3.0, etc.
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to push commits back
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }} # Checkout the branch, not a detached HEAD
+
+      - name: Extract version from branch name
+        id: extract_version
+        run: |
+          # Removes 'refs/heads/release/' or just 'release/'
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          VERSION=${BRANCH_NAME#release/}
+          # Clean 'v' prefix if present (v1.0.0 -> 1.0.0) so package.json is valid
+          VERSION=${VERSION#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions-bot"
+          git config user.email "github-actions-bot@github.com"
+
+      - name: Update package.json version
+        run: |
+          # Updates package.json and package-lock.json without creating a git tag
+          npm version $VERSION --no-git-tag-version
+
+      - name: Commit and Push
+        run: |
+          # Check if there are changes to commit
+          if [[ -n $(git status -s) ]]; then
+            git add package.json package-lock.json
+            # [skip ci] prevents this commit from triggering the workflow again
+            git commit -m "chore(release): bump version to $VERSION [skip ci]"
+            git push
+          else
+            echo "Version is already up to date."
+          fi
+
+      - name: Create Pull Requests (Safe & Idempotent)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # -------------------------------------------------------
+          # 1. PR to Main (Production Deployment)
+          # -------------------------------------------------------
+          # Check if PR exists specifically for this branch -> main
+          PR_MAIN=$(gh pr list --head ${{ env.BRANCH_NAME }} --base main --json url --jq '.[0].url')
+
+          if [ -z "$PR_MAIN" ]; then
+            echo "Creating PR to main..."
+            gh pr create \
+              --base main \
+              --head ${{ env.BRANCH_NAME }} \
+              --title "Release v${{ env.VERSION }}" \
+              --body "Automated PR for Release v${{ env.VERSION }}. Merging this will trigger production deployment."
+          else
+            echo "PR to main already exists: $PR_MAIN"
+          fi
+
+          # -------------------------------------------------------
+          # 2. PR to Develop (Back-Sync)
+          # -------------------------------------------------------
+          # Check if PR exists specifically for this branch -> develop
+          PR_DEV=$(gh pr list --head ${{ env.BRANCH_NAME }} --base develop --json url --jq '.[0].url')
+
+          if [ -z "$PR_DEV" ]; then
+            echo "Creating PR to develop..."
+            gh pr create \
+              --base develop \
+              --head ${{ env.BRANCH_NAME }} \
+              --title "chore: sync release v${{ env.VERSION }} to develop" \
+              --body "Back-merging version bump and release fixes to the development branch."
+          else
+             echo "PR to develop already exists: $PR_DEV"
+          fi
