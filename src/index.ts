@@ -46,7 +46,7 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 app.post('/server/join/', async (req: Request, res: Response) => {
-  console.log('SERVER: new user joining room', req.body);
+  console.log('SERVER: new user joining room', req.body.user_id);
   // save token to correct room
   const validationPayload: ValidationPayload = {
     canva_id: req.body.canva_id,
@@ -99,7 +99,6 @@ io.on('connection', socket => {
         message: 'user wont be allowed to place pixels',
         status: 200,
       });
-      return;
     }
     if (isValid === null) {
       socket.emit('error', {
