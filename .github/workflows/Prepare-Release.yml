@@ -37,8 +37,8 @@ jobs:
 
       - name: Update package.json version
         run: |
-          # Updates package.json and package-lock.json without creating a git tag
-          npm version $VERSION --no-git-tag-version
+          # Suppress error if version is already correct
+          npm version $VERSION --no-git-tag-version || echo "Version unchanged; continuing."
 
       - name: Commit and Push
         run: |
