@@ -27,6 +27,7 @@ jobs:
           VERSION=${BRANCH_NAME#release/}
           # Clean 'v' prefix if present (v1.0.0 -> 1.0.0) so package.json is valid
           VERSION=${VERSION#v}
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Configure Git
