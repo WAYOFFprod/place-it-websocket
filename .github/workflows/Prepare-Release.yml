@@ -55,7 +55,7 @@ jobs:
 
       - name: Create Pull Requests (Safe & Idempotent)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN}}
         run: |
           # -------------------------------------------------------
           # 1. PR to Main (Production Deployment)
