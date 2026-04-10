@@ -45,8 +45,8 @@ export default class CanvaController {
     if (username == null) {
       username = socket.id;
     }
-    if (userId) {
-      console.warn('No user id');
+    if (!userId) {
+      console.warn('No user id', userId);
     }
 
     socket.on(
